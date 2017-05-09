@@ -69,3 +69,37 @@ function displayFolders() {
 		displaySongsInFolder(folderArrayIndex);
 	});
 }
+
+// Display Song
+
+function displaySongsInFolder(_folderArrayIndex) {
+
+	midiSelectIndex = -1;
+	folderArrayIndex = _folderArrayIndex;
+	setMenuSelection('folder' + _folderArrayIndex);
+
+	let folderName = folderArray[folderArrayIndex];
+	// Allows folders to have '&'character in it
+	folderName = folderName.replace("&", "%26");
+	$('#songListContent').html("");
+
+	$.post(playlistPath, {folder: folderName}).success(function(response) {
+		eval("songArray = "+ response);
+		constructRandList(songArray.length);
+
+		let htmlString = "<table id='songList_table' class='songList_boxStyle2' width='100%' border='0' cellpadding='0' cellspacing='0'>";
+
+		for(let i=0; i<songArray.length ; i++) {
+			let lineStyle = (i%2 == 0 ? 'songList_lineStyle1 ' : 'songList_lineStyle2');
+			htmlString += "<tr class="+lineStyle+">";
+			htmlString += "<td width='35' align='right'><a onclick=loadSongFromSongArray('player1',"+i+")><div class='songList_icon_load_player1'></div></a></td>";
+			htmlString += "<td width='50' align='left'> <a onclick=loadSongFromSongArray('player2',"+i+")><div class='songList_icon_load_player2'></div></a></td>";
+			htmlString += "<td width='250' align='left'><p class='songList_textStyle1'>"+songArray[i].artist+"</p></td>";
+			htmlString += "<td align='left'><p class='songList_textStyle2'>"+songArray[i].title+"</p></td>";
+			htmlString += "</tr>";
+		}
+
+		htmlString += "</table>";
+		$('#songListContent').html(htmlString);
+	});
+}
