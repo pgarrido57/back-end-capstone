@@ -47,4 +47,44 @@ function listAllFolders()
       echo ($i == count($folderNameList) - 1 ? "]" : "");
     }
   }
+
+	// List all songs in folders
+
+	function listAllSongsInFolder($selectedFolder)
+	// List MP3's in selected folder
+	{
+    global $databaseFolder;
+
+	if(is_dir($databaseFolder.'/'.$selectedFolder))
+	{
+	  $dh = opendir($databaseFolder.'/'.$selectedFolder);
+
+			// List file in $selectedFolder
+			while (($fileName = readdir($dh)) !== false)
+				// If file is a MP3
+				if(strpos($fileName,'.mp3'))
+					$fileNameList[] = $fileName;
+
+			if(!isset($fileNameList))
+			$fileNameList[] = "OOOPS! no mp3 file found in this folder";
+
+		// If natcasesort is not supported
+		sort($fileNameList);
+		// Sort filenames list
+		natcasesort($fileNameList);
+
+		closedir($dh);
+	}
+
+	// Output the file list in a JS format
+	for($i=0; $i<count($fileNameList); $i++)
+		{
+			// Extract songs info from filename
+			$songInfo = getSongInfo($fileNameList[$i]);
+			echo ($i == 0 ? "[" : ",");
+		  echo "{filename:'".out($selectedFolder.'/'.$fileNameList[$i])."',artist:'".out($songInfo["artist"])."',title:'".out($songInfo["title"])."'}";
+	      echo ($i == count($fileNameList) - 1 ? "]" : "");
+		}
+	  }
+
  ?>
