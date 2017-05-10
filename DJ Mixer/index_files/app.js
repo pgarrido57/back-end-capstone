@@ -12,10 +12,10 @@ var songsIndexOnStart = new Array();
 var playlistPath = require('./playlist_list.php');
 
 // Path for record API
-var recordPath = require('../djFiles/dj_api_record.php');
+var recordPath = require('../djFiles/record.php');
 
 // Path for sampler API
-var samplerPath = require('../djFiles/dj_api_sampler.php');
+var samplerPath = require('../djFiles/sampler.php');
 
 
 // Init
