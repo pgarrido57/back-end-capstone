@@ -87,4 +87,24 @@ function listAllFolders()
 		}
 	  }
 
+		// Get file info
+		function getSongInfo($_fileName)
+		{
+			$songInfo["uniqueId"] = dechex(crc32($_fileName));
+			$_fileName = str_replace (".mp3", "", $_fileName);
+			$_fileName = str_replace ("_", " ", $_fileName);
+				$pieces = explode("-", $_fileName);
+
+				if(strpos($pieces[0], "BPM"))
+					array_shift($pieces);
+
+				// Extract the song's artist
+				$songInfo["artist"] = trim(array_shift($pieces));
+				// Extract the songs title
+				$songInfo["title"] = trim(implode("-", $pieces));
+
+				return $songInfo; 
+		}
+
+
  ?>
