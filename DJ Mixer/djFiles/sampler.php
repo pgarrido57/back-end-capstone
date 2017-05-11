@@ -1,6 +1,6 @@
 <?php
 header('Content-type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *')
+header('Access-Control-Allow-Origin: *');
 
 $dir = "./sampler_directory";
 
@@ -10,7 +10,7 @@ if (is_dir($dir)) {
 	if ($dh = opendir($dir)) {
 	$data = array();
 			// Push all samples in $data
-			while (($file = readdir($dh)) ! == false) {
+			while (($file = readdir($dh)) !== false) {
 				$ext = substr( $file, strlen($file)-4);
 				if($ext == ".mp3"){
 					$file = substr( $file, 0, strlen($file)-4);
