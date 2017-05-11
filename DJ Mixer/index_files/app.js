@@ -103,3 +103,46 @@ function displaySongsInFolder(_folderArrayIndex) {
 		$('#songListContent').html(htmlString);
 	});
 }
+
+// Display recorded mixes
+
+function displayRecordMixes() {
+
+	setMenuSelection("menu_record");
+	$.get(recordPath).success(function(res) {
+		if (res.error)
+		console.log(res.error);
+		else if (res.result && res.result.length) {
+
+			var mixNb = 0;
+			var htmlString = "<table id='songList_table' class='songList_boxStyle2' width='100%' border='0' cellpadding='0' cellspacing='0'>";
+
+			for (var i=0; i<res.result.length; i++) {
+
+				var mix = res.result[i];
+				var mixTime = mix.info.time * 1000;
+				var mixOldness = new Date().getTime() - mixTime;
+				var mixDuration = (mix.info.live ? mixOldness : mix.info.duration);
+
+				var onclick = 'djPlayer.loadMix("' + mix._id.$id + '")';
+				var lineStyle = (mixNb%2==0 ? ' songList_textStyle1' : 'songList_lineStyle2');
+				var displayMix = (mixDuration > 60 * 1000 || mixOldness < 8 * 3600 * 1000);
+				var urlDjPlayer = "http://"+index_path+"?id="+mix._id.$id;
+
+				if(displayMix) {
+						htmlString += "<tr class="+lineStyle+">";
+						htmlString += "<td width='73' align='center'><a onclick='"+onclick+"'><div class='songList_icon_load_play'></div></a></td>";
+						htmlString += "<td width='545' align='left'><a class='songList_mixLink' onclick='"+onclick+"'>"+mix.info.name+" Recorded Mix <font color='#999999'> - "+(new Date(mixTime).toString("MMMM dd, h:mm tt"))+"</font></div></a></td>";
+						htmlString += "<td width='60' align='right'><a href='"+urlFullPlayer+"' target='_blank'><div class='songList_icon_share'></div></a></td>";
+						htmlString += "<td width='40' align='right'><p class='songList_textStyle2'>"+(new Date(mixDuration).toString("m:ss"))+"</p></td>";
+						htmlString += "<td align='center'>"+(mix.info.live ? "<div class='songList_icon_live'></div>" : "<p></p>")+"</td>";
+						htmlString += "</tr>";
+						mixNb++;
+			}
+		}
+
+		htmlString += "</table>";
+	       		$('#songListContent').html(htmlString);
+		}
+	});
+}

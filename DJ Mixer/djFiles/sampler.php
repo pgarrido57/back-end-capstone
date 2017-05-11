@@ -23,5 +23,6 @@ if (is_dir($dir)) {
 			closedir($dh);
 	}
 }
+// Return result
 echo json_encode(array('result'=>$data));
 ?>
