@@ -146,3 +146,48 @@ function displayRecordMixes() {
 		}
 	});
 }
+
+// Sampler
+
+function displaySampler() {
+
+	setMenuSelection("menu_sampler");
+	$.get(samplerPath).success(function(res) {
+		if (res.error)
+		console.log(res.error);
+		else if (res.result && res.result.length) {
+
+			var nbRow = Math.floor(res.result.length / 3);
+			var htmlString = "<table id='songList_table' class='songList_boxStyle2' width='100%' border='0' cellpadding='0' cellspacing='0'>";
+
+			for (var i=0; i<nbRow; i++) {
+				var lineStyle = (i%2==0 ? 'songList_lineStyle1 ' : 'songList_lineStyle2');
+				htmlString += "<tr class="+lineStyle+">";
+
+			for(var j=0; j<3; j++) {
+				var sampleName = res.result[i+j*nbRow];
+				var sampleAbsoluteUrl = "//" +directory_path+"/djFiles/sampler_directory/"+sampleName+".mp3";
+				htmlString += "<td width='74' align='center'><a onclick='djPlayer.loadSample(\""+sampleAbsoluteUrl+"\");'><div id='sample_"+sampleName+"' class='songList_icon_load_play'></div></a></td>";
+				htmlString += "<td width='260'><p class='songList_textStyle1'>"+sampleName.replace(/_/g," ")+"</p></td>";
+			}
+			htmlString += "</tr>";
+		}
+		htmlString += "</table>";
+	       		$('#songListContent').html(htmlString);
+		}
+	});
+}
+
+function samplePlayEvent(sampleAbsoluteUrl) {
+	var samplePlayEvent = $('#' = getDivFromSampleUrl(sampleAbsoluteUrl));
+	if (!sampleElement.hasClass('songList_icon_load_play_active')) sampleElement.addClass('songList_icon_load_play_active').removeClass('songList_icon_load_play');
+}
+
+function sampleStopEvent(sampleAbsoluteUrl) {
+	var sampleElement = $('#' + getDivFromSampleUrl(sampleAbsoluteUrl));
+	if (sampleElement.hasClass('songList_icon_load_play_active')) sampleElement.addClass('songList_icon_load_play').removeClass('songList_icon_load_play_active');
+}
+
+function getDivFromSampleUrl(_str) {
+	return "sample_"+_str.match(/^(.*\/)?(?:$|(.+?)(?:(\.[^.]*$)|$))/)[2];
+}
