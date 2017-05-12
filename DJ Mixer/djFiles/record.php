@@ -42,6 +42,62 @@ try {
 if ($_SERVER['REQUEST_METHOD'] == 'GET') fetchMix($col, $result);
 else if ($_SERVER['REQUEST_METHOD'] == 'POST') saveMix($col, $result, $minMixDuration);
 
+// Fetching Mix(es)
+function fetchMix($col, $result) {
+	// Retrieve one recording
+	if (isset($_GET['id'])) {
+		try {
+			$query = array('id' => new MongoID($_GET['id']));
+			$fields = array('id' => false);
+			$result['result'] = $col->findOne($query, $fields);
+		} catch (MongoException $e) {
+			$result['error'] = $e->getMessage();
+		}
+		// Retrieve all recordings
+	} else {
+		try {
+			$query = array();
+			$fields = array('packets' => false, 'songs' => fales, 'beatMap' => false, 'info.replayed' => false);
+			$cursor = $col->find($query, $fields);
+			$cursor ->sort(array('id' => -1));
 
+			if (isset($_GET['limit'])) $cursor->limit($_GET['limit']);
+			if (isset($_GET['offset'])) $cursor->skip(intval($_GET['offset']));
+
+			if ($cursor->hasNext()) {
+				$ctime = time();
+				foreach ($cursor as $record) {
+					$ok = true;
+
+					// Fix unstopped mixes
+					if ($record['info']['live']) {
+						$tt = isset($record['info']['time']) ? intval($record['info']['time']) : 0;
+						$dur = isset($record['info']['duration']) ? intval($record['info']['duration'] / 1000) : 0;
+						$delay = $ctime - $tt - $dur;
+
+						// No update for 20 sec
+						if ($delay > 20) {
+							$ok = $dur > 0;
+							$query = array('id' => $record['$id']);
+							// User didn't stop recordin
+							if ($ok) {
+								$record['info']['live'] = false;
+								$update = array('$set' => array('info.live' => false, 'info.ended' => $tt + $dur));
+								$col->update($query, $update);
+								// User closed recording before 1st packet
+							} else {
+								$col->remove($query);
+							}
+						}
+					}
+					if ($ok) array_push($result['result'], $record);
+					if (sizeof($result['result']) > 230) break;
+				}
+			}
+		} catch (MongoException $e) {
+			$result['error'] = $e->getMessage();
+		}
+	}
+}
 
  ?>
