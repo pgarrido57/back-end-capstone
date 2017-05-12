@@ -100,4 +100,81 @@ function fetchMix($col, $result) {
 	}
 }
 
- ?>
+// Saving mix
+
+function saveMix($col, $result, $minMixDuration) {
+	if (!isset($_POST['data']) || !is_string($_POST['data'])) {
+		header('HTTP/1.1 400 Bad Request');
+		$result['error'] = 'bad input format';
+		exit(json_encode($result));
+	}
+
+	$data = array('packets' => array(), 'beatMap' => array(), 'songs' => array());
+	$datas = json_decode($_POST['data'], true);
+
+	// Unpacking the mixDataQueue into $data
+	foreach ($datas as $requestNum => $request) {
+		if(!isset($lastRequestNum)) $lastRequestNum = isset($_SESSION[$request['id']]) ? $_SESSION[$request['id']] : -1;
+		if ($requestNum > $lastRequestNum) {
+			$data['id'] = $request['id'];
+			$data['requestNum'] = $requestNum;
+
+			if (isset($request['info'])) $data['info'] = $request['info'];
+			if (isset($request['packets'])) {
+				if (is_string($request['packets'])) $request['packets'] = array($request['packets']);
+				$data['packets'] = array_merge($data['packets'], $request['packets']);
+			}
+			if (isset($request['beatMap'])) $data['beatMap'] = array_merge($data['beatMap'], $request['beatMap']);
+			if (isset($request['songs'])) $data['songs'] = array_merge($data['songs'], $request['songs']);
+		}
+	}
+
+	$content = array('$set' => array());
+	$isNewMix = !isset($data['id']) || $data['id'] == 'null';
+	$hasPackets = isset($data['packets']) && count($data['packets']);
+
+	if ($isNewMix) {
+		$name = substr($_POST['name'], 0, 40);
+		$name = ucwords(trim(strtolower($name)));
+		$content['$set']['info.duration'] = 0;
+		$content['$set']['info.live'] = true;
+		$content['$set']['info.name'] = $name;
+		$content['$set']['info.time'] = time();
+	}
+	if ($hasPackets) {
+		$content['$set']['info.duration'] = $data['info']['duration'];
+		$content['$set']['info.live'] = $data['info']['live'];
+		if (isset($data['info'])) $content['$set']['info.error'] = $data['info']['error'];
+		if (!$data['info']['live']) $content['$set']['info.ended'] = time();
+
+		$content['$pushAll'] = array(
+			'packets' => $data['packets'],
+			'beatMap' => $data['beatMap'],
+			'songs.player1' => $data['songs']['player1'],
+			'songs.player2' => $data['songs']['player2'],
+			'songs.started' => $data['songs']['started'],
+			'songs.sampler' => $data['songs']['sampler']
+		);
+	}
+
+	// Upsert in mongo
+	$query = array('id' => new MongoId($data['id']));
+	$option = array('safe' => true, 'upsert' => true);
+
+	try {
+		$upsert = $col->update($query, $content, $options);
+		$result['result'] = $upsert['ok'];
+		$result['error'] = $upsert['err'];
+		if ($isNewMix) $result['id'] = $data['id'] = (string) $upsert['upserted'];
+		if ($uspert['ok']) $_SESSION[$data['id']] = $data['requestNum'];
+	} catch (MongoException $e) {
+		$result['error'] = $e->getMessage();
+	}
+
+	if ($hasPackets && !$data['info']['live'] && $data['info']['duration'] < $minMixDuration) {
+		$col->remove(array('id' =>  new MongoID($data['id'])));
+	}
+}
+
+echo json_encode($result);
+?>
