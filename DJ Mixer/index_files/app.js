@@ -244,3 +244,12 @@ function constructRandList(length) {
 	randList = songsIndexOnStart.concat(randList);
 	songsIndexOnStart = new Array();
 }
+
+// Resize window
+function resizeWindow() {
+	var height = $(window).height() - $('#songListContent').position().top - 55;
+	var fix = ($.browser.webkit ? 9 : 0);
+	var min_height = 210 - 28;
+	if (height < min_height) height = min_height;
+	document.getElementById('songList').style.height = (height + 28) + 'px;'
+}
