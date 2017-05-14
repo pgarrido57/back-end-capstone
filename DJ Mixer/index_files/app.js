@@ -207,3 +207,22 @@ function loadSongFromSongArray(controller, index) {
 	djPlayer.loadSong(controller, "//"+directory_path+ "/music/" +songArray[index].fileName, "", songArray[index].artist+"#"+songArray[index].title, bpmRangeMax, 0);
 	lastIdx = index;
 }
+
+// Retrieve events
+function LOAD_SONG_REQUEST(askingController) {
+	loadSongRandom(askingController);
+}
+
+function GET_INFORMATION(key, value) {
+	switch (key) {
+		case "sample_play": samplePlayEvent(value); break;
+		case "sample_stop": sampleStopEvent(value); break;
+		case "song_playing": $("#title").html(value.split("#")[0]+" - "+value.split("#")[1]); $("#title1").html(value.split("#")[1].slice(0, 18)); break;
+		case "song_mixing":	isPlayer2Active = (value.split("#")[0] != ""); $("#title2").html(value.split("#")[1].slice(0,18)); break;
+		case "midiLoadPlayerA": loadSongFromSongArray("player1", midiSelectIndex); break;
+		case "midiLoadPlayerB": loadSongFromSongArray("player2", midiSelectIndex); break;
+		case "midiSelectNextSong": selectSongFromPlaylist(midiSelectIndex + 1); break;
+		case "midiSelectPreviousSong": selectSongFromPlaylist(midiSelectIndex - 1); break;
+		break;
+	}
+}
