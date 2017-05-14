@@ -89,7 +89,7 @@ function displaySongsInFolder(_folderArrayIndex) {
 
 		var htmlString = "<table id='songList_table' class='songList_boxStyle2' width='100%' border='0' cellpadding='0' cellspacing='0'>";
 
-		for(var i=0; i<songArray.length ; i++) {
+		for(var i = 0; i < songArray.length ; i++) {
 			var lineStyle = (i%2 == 0 ? 'songList_lineStyle1 ' : 'songList_lineStyle2');
 			htmlString += "<tr class="+lineStyle+">";
 			htmlString += "<td width='35' align='right'><a onclick=loadSongFromSongArray('player1',"+i+")><div class='songList_icon_load_player1'></div></a></td>";
@@ -117,7 +117,7 @@ function displayRecordMixes() {
 			var mixNb = 0;
 			var htmlString = "<table id='songList_table' class='songList_boxStyle2' width='100%' border='0' cellpadding='0' cellspacing='0'>";
 
-			for (var i=0; i<res.result.length; i++) {
+			for (var i = 0; i < res.result.length; i++) {
 
 				var mix = res.result[i];
 				var mixTime = mix.info.time * 1000;
@@ -160,11 +160,11 @@ function displaySampler() {
 			var nbRow = Math.floor(res.result.length / 3);
 			var htmlString = "<table id='songList_table' class='songList_boxStyle2' width='100%' border='0' cellpadding='0' cellspacing='0'>";
 
-			for (var i=0; i<nbRow; i++) {
+			for (var i = 0; i < nbRow; i++) {
 				var lineStyle = (i%2==0 ? 'songList_lineStyle1 ' : 'songList_lineStyle2');
 				htmlString += "<tr class="+lineStyle+">";
 
-			for(var j=0; j<3; j++) {
+			for(var j = 0; j < 3; j++) {
 				var sampleName = res.result[i+j*nbRow];
 				var sampleAbsoluteUrl = "//" +directory_path+"/djFiles/sampler_directory/"+sampleName+".mp3";
 				htmlString += "<td width='74' align='center'><a onclick='djPlayer.loadSample(\""+sampleAbsoluteUrl+"\");'><div id='sample_"+sampleName+"' class='songList_icon_load_play'></div></a></td>";
@@ -225,4 +225,22 @@ function GET_INFORMATION(key, value) {
 		case "midiSelectPreviousSong": selectSongFromPlaylist(midiSelectIndex - 1); break;
 		break;
 	}
+}
+
+// Construct Random List
+function constructRandList(length) {
+	randList = new Array();
+
+	for (var i = 0; i < length; i++) {
+		var isSongsOnStart = false;
+		for (var j = 0; j < songsIndexOnStart.length; j++)
+		if (i == songsIndexOnStart[j])
+		isSongsOnStart = true;
+
+		var insertIndex = Math.round(Math.random() * i);
+		if (!isSongsOnStart) randList.splice(insertIndex, 0, i);
+	}
+
+	randList = songsIndexOnStart.concat(randList);
+	songsIndexOnStart = new Array();
 }
