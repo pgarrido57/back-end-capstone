@@ -191,3 +191,19 @@ function sampleStopEvent(sampleAbsoluteUrl) {
 function getDivFromSampleUrl(_str) {
 	return "sample_"+_str.match(/^(.*\/)?(?:$|(.+?)(?:(\.[^.]*$)|$))/)[2];
 }
+
+// Send commands
+function loadNextSong(controller) {
+	loadSongFromSongArray(controller, (lastIdx = 1) % songArray.length);
+}
+
+function loadSongRandom(controller) {
+	loadSongFromSongArray(controller, randList[(randIdx++) % randList.length]);
+}
+
+function loadSongFromSongArray(controller, index) {
+	if(index < 0 || index >= songArray.length) return;
+	if(!mixLoadedOnStart && (typeof mixIdToLoadOnStart == 'string')) { mixLoadedOnStart = true; djPlayer.loadMix(mixIdToLoadOnStart); return; }
+	djPlayer.loadSong(controller, "//"+directory_path+ "/music/" +songArray[index].fileName, "", songArray[index].artist+"#"+songArray[index].title, bpmRangeMax, 0);
+	lastIdx = index;
+}
