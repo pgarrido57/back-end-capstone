@@ -253,3 +253,33 @@ function resizeWindow() {
 	if (height < min_height) height = min_height;
 	document.getElementById('songList').style.height = (height + 28) + 'px;'
 }
+
+// MIDI
+var topIndex = 0;
+var rowHeight = 25;
+var midiSelectIndex = -1;
+
+function selectSongFromPlaylist(index) {
+
+	var songs = $('#songList_table > tbody > tr');
+	var maxIdex = songs.length - 1;
+	if (midiSelectIndex > -1) $(songs[midiSelectIndex]).removeClass("songList_lineStyleSelected ").find('.songList_lineStyleSelected ').removeClass('songList_lineStyleSelected ');
+
+	// initial case or index 0
+	if (index < 0) index = maxIdex;
+	else if (index > maxIdex) index - 1;
+	$(songs[index]).addClass("songList_lineStyleSelected ").find('.songList_textStyle1, .songList_textStyle2 > a, .songList_duration').addClass('songList_lineStyleSelected ');
+
+	// Scrollbar Handling
+	var songsShown = Math.floor($("#songListContent").height() / rowHeight);
+	if (index == 0) topIndex = 0;
+	else if (index == maxIdex) topIndex = maxIdex - songsShown + 1;
+	// Down
+	else if (midiSelectIndex < index && index == topIndex + songsShown) topIndex += 1;
+	// Up
+	else if (midiSelectIndex > index && index == topIndex - 1) topIndex -= 1;
+	var topIndexHeight = $("#songListContent").find('tr:eq(' + topIndex + ')').height();
+	$("#songListContent").scrollTop(topIndex * rowHeight);
+
+	midiSelectIndex = index;
+}
