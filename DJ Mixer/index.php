@@ -11,7 +11,6 @@ if(isset($_GET['id'])) echo "<script>var mixIdToLoadOnStart = '".$_GET['id']."';
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <link rel="icon" href="index_files/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="index_files/styles.css"/>
-<script type="text/javascript" src="index_files/jquery-1.6.min.js"></script>
 <script type="text/javascript" src="index_files/app.js"></script>
 <script type="text/javascript" src="djFiles/record.js"></script>
 </head>
