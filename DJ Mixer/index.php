@@ -38,7 +38,7 @@ if(isset($_GET['id'])) echo "<script>var mixIdToLoadOnStart = '".$_GET['id']."';
 					 <table width="1012" cellpadding="0" cellspacing="0">
 						<tr>
 						  <td width="1012" height="311" valign="top" align="center">
-							 <div id="iWebDjEngine">
+							 <div id="djEngine">
 								<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" id="djPlayer" width="1012" height="304" align="middle">
 								  <param name="allowScriptAccess" value="always" />
 								  <param name="movie" value="preloader.swf" />
